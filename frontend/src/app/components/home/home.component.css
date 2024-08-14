@@ -1,0 +1,11 @@
+.pvp-mode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.mode {
+  width: 100px;
+  height: 100px;
+}
