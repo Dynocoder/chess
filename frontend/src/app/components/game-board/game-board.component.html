@@ -1,0 +1,8 @@
+<div class="board">
+  <div class="row" *ngFor="let row of chessBoardView; let x = index">
+    <div class="square" *ngFor="let piece of row; let y = index" [ngClass]="{'dark': isDarkSquare(x, y), 'light': !isDarkSquare(x, y)}" (click)="triggerSelection(x, y)">
+      <img class="piece" *ngIf="piece.length > 0" [src]="getPiecePath(x, y)" [ngClass]="{'selected-square': isSelected(x, y)}">
+      <p>{{x}},{{y}}</p>
+    </div>
+  </div>
+</div>

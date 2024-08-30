@@ -1,10 +1,16 @@
-<div class="pvp-mode">
-  <div class="mode">
-    <!-- <input mat-button type="button" name=""> -->
-    <input mat-input type="text" placeholder="asdfasf">
-    <br>
-    <button mat-button>asdf</button>
-    <br>
-    <button mat-button>asas</button>
+<div class="home-content">
+  <h1>Play Chess</h1>
+  <h2>Select Mode</h2>
+  <div class="modes">
+    <a routerLink="/game-board">
+      <mat-card appearance="outlined" class="pvp-mode">
+        <mat-card-header>
+          <h4>PvP</h4>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Match Against a real Player</p>
+        </mat-card-content>
+      </mat-card>
+    </a>
   </div>
 </div>

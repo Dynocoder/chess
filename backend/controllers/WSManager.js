@@ -4,6 +4,9 @@ import { v4 as uuid } from "uuid";
 export default class WSManager {
 
   userList = [];
+  messageType = {
+    'GetInitialState': 1,
+  }
 
   /**
    * Purpose is to manage websocket connection
@@ -55,15 +58,37 @@ export default class WSManager {
         ws: ws
       }
 
-      // TODO: based on the request, process as PvP or PvC;
-      console.log(request);
-
-
 
       // TODO: return the ws object for future event subscription.
+      ws.on('message', (data) => {
+        console.log(`[user]: ${JSON.parse(data)}`);
+      })
+
+      ws.on('close', (data) => {
+        console.log(`[server]: the connection was closed`);
+      })
+
+      // setInterval(() => {
+      //   ws.send("pinging from the server")
+      // }, 2000);
 
 
+      this.sendInitialBoardState(ws);
     })
+
   }
 
+  /**
+  * send the initial board state when all pieces are in their initial position
+  * @param {WebSocket} ws - the websocket object to send the board state to.
+  */
+  sendInitialBoardState(ws) {
+    // const board = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
+    const board = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    const d = {
+      "messageType": 1,
+      "board": board
+    }
+    ws.send(JSON.stringify(d));
+  }
 }

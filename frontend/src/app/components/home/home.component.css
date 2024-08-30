@@ -1,11 +1,22 @@
-.pvp-mode {
+.home-content {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100%;
 }
 
-.mode {
-  width: 100px;
-  height: 100px;
+.modes {
+  display: flex;
+}
+
+.modes a {
+  text-decoration: none;
+  color: black;
+}
+
+.pvp-mode h4 {
+  margin: auto;
+}
+
+.pvp-mode p {
+  margin-top: 2em;
 }
