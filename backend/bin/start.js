@@ -1,21 +1,21 @@
 import { WebSocketServer } from 'ws';
 import { app } from '../app.js';
 import WSManager from '../controllers/WSManager.js';
+import GamesController from '../controllers/GamesController.js';
 
 const PORT = process.env.PORT ?? 3000;
-export const wss = new WebSocketServer({ noServer: true, clientTracking: true });
 
 
-const wsm = new WSManager(wss);
+const gc = new GamesController();
+const wsm = new WSManager(gc);
 
-// starting the http server.
-export const server = app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
-
-// subscribing to server upgrade event.
-server.on('upgrade', (request, socket, head) => {
-  console.log("[server]: upgraded");
-  wss.handleUpgrade(request, socket, head, (ws) => {
-    wss.emit('connection', ws, request);
+export function startServer(port) {
+  return new Promise((resolve) => {
+    const server = app.listen(port, () => resolve({ server, port }));
   })
-})
+}
 
+startServer(PORT).then(({ server, port }) => {
+  console.log(`Listening on port ${port}`);
+  wsm.createWebSocketServer(server);
+});

@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon bin/start.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "type": "module",
   "keywords": [],
@@ -18,5 +18,12 @@
     "morgan": "^1.10.0",
     "uuid": "^10.0.0",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@types/jest": "^29.5.12",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0"
   }
 }

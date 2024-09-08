@@ -11,6 +11,10 @@ export const app = express();
 app.use(logger('dev'));
 app.use('/api', router);
 
+app.get('/', (req, res) => {
+  res.send('asdfasdfasdf');
+})
+
 export { dotenv };
 
 /**

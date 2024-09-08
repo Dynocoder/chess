@@ -20,6 +20,10 @@ export class WebSocketControllerService {
   startConnection(URL: string): WebSocket {
     this._socket = new WebSocket(URL)
 
+    setTimeout(() => {
+      this._socket.send("{}asdfasfasdfaf");
+    }, 1000);
+
     return this._socket;
   }
 

@@ -1,5 +1,7 @@
-import WebSocket from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 import { v4 as uuid } from "uuid";
+import GamesController from "./GamesController.js";
+import { Server } from "http";
 
 export default class WSManager {
 
@@ -14,18 +16,24 @@ export default class WSManager {
    * - start Game - Multiplayer/api
    * - close connection
    * @param {WebSocket.Server} wss
+   * @param {GamesController} gc - gameController object.
    */
-  constructor(wss) {
-    this.wss = wss;
-    this.connectionSubscriber(wss);
+  constructor(gc) {
+    this.gc = gc
+    // this.wss = wss;
   }
 
 
   /**
+   * @param {WebSocket} ws - the websocket client to add.
    * @param {User} user
-   * @param {User[]} userList
    */
-  addUser(user, userList) {
+  addUser(ws) {
+    const user = {
+      id: uuid(),
+      ws: ws
+    }
+    this.gc.enqueueForLookup(user);
   }
 
   /**
@@ -33,6 +41,30 @@ export default class WSManager {
   * @param {User[]} userList
   */
   removeUser(user, userList) {
+  }
+
+
+  /**
+   * Creates a new WebSocketServer Instance with the passed http server attached.
+   * @param {Server} server
+   */
+  createWebSocketServer(server) {
+
+    this.wss = new WebSocketServer({ server: server, clientTracking: true });
+
+    this.wss.on('connection', (ws, request) => {
+      // TODO: send the uuid back to the client.
+      this.addUser(ws);
+      ws.on('message', (data) => {
+        console.log(`[server]: received -> ${data}`)
+        ws.send(data)
+      })
+    })
+
+
+    this.wss.on('close', (ws, request) => {
+
+    })
   }
 
 
@@ -45,37 +77,11 @@ export default class WSManager {
 
 
   /**
-  * subscribes to the connection event
-  * @param {WebSocket.Server} wss
-  */
-  connectionSubscriber(wss) {
-    wss.on('connection', (ws, request) => {
-      /**
-       * @type {User}
-       */
-      let user = {
-        id: uuid(),
-        ws: ws
-      }
-
-
-      // TODO: return the ws object for future event subscription.
-      ws.on('message', (data) => {
-        console.log(`[user]: ${JSON.parse(data)}`);
-      })
-
-      ws.on('close', (data) => {
-        console.log(`[server]: the connection was closed`);
-      })
-
-      // setInterval(() => {
-      //   ws.send("pinging from the server")
-      // }, 2000);
-
-
-      this.sendInitialBoardState(ws);
-    })
-
+   * @param {WebSocket} ws - the Websocket to subscribe to events for.
+   * @param {import("express").Request} request - request parameters.
+   */
+  connectionSubscriber(ws, request) {
+    //TODO: implement logic
   }
 
   /**
