@@ -1,31 +1,114 @@
 import UserQueue from "../controllers/UserQueue";
 
-test("UserQueue", () => {
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+}
 
-  let uq = new UserQueue();
+describe('UserQueue', () => {
+  let queue;
 
-  uq.push(5);
-  uq.push(7);
-  uq.push(9);
+  beforeEach(() => {
+    queue = new UserQueue();
+  });
 
-  expect(uq.length).toEqual(3);
+  test('should start with an empty queue', () => {
+    expect(queue.length).toBe(0);
+    expect(queue.peek()).toBeUndefined();
+  });
 
-  expect(uq.pop()).toEqual(5);
-  expect(uq.length).toEqual(2);
+  test('should push a user and increase the length', () => {
+    const user1 = new User('Alice');
+    queue.push(user1);
+    expect(queue.length).toBe(1);
+    expect(queue.peek()).toBe(user1);
+  });
 
-  expect(uq.peek()).toEqual(7);
-  expect(uq.length).toEqual(2);
+  test('should push multiple users and maintain correct order', () => {
+    const user1 = new User('Alice');
+    const user2 = new User('Bob');
+    queue.push(user1);
+    queue.push(user2);
+    expect(queue.length).toBe(2);
+    expect(queue.peek()).toBe(user1); // Alice should be first
+  });
 
+  test('should pop users in the correct order', () => {
+    const user1 = new User('Alice');
+    const user2 = new User('Bob');
+    queue.push(user1);
+    queue.push(user2);
 
-  expect(uq.pop()).toEqual(7);
-  expect(uq.pop()).toEqual(9);
+    expect(queue.pop()).toBe(user1); // Pop Alice first
+    expect(queue.length).toBe(1);
+    expect(queue.peek()).toBe(user2); // Bob should be next
+    expect(queue.pop()).toBe(user2); // Pop Bob next
+    expect(queue.length).toBe(0);
+    expect(queue.pop()).toBeUndefined(); // Popping an empty queue returns undefined
+  });
 
-  expect(uq.length).toEqual(0);
+  test('should handle popping from an empty queue', () => {
+    expect(queue.pop()).toBeUndefined();
+  });
 
-  expect(uq.pop()).toEqual(undefined);
+  test('should handle peeking from an empty queue', () => {
+    expect(queue.peek()).toBeUndefined();
+  });
 
-  uq.push(3);
-  expect(uq.length).toEqual(1);
+  test('should reset head and tail after all users are popped', () => {
+    const user1 = new User('Alice');
+    const user2 = new User('Bob');
+    queue.push(user1);
+    queue.push(user2);
 
+    queue.pop(); // Pop Alice
+    queue.pop(); // Pop Bob
 
-})
+    expect(queue.length).toBe(0);
+    expect(queue.head).toBeUndefined(); // Head should be reset
+    expect(queue.tail).toBeUndefined(); // Tail should be reset
+  });
+
+  test('should handle a large number of users', () => {
+    const numUsers = 1000;
+    const users = Array.from({ length: numUsers }, (_, i) => new User(`User${i + 1}`));
+
+    users.forEach(user => queue.push(user));
+    expect(queue.length).toBe(numUsers);
+
+    users.forEach(user => {
+      expect(queue.pop()).toBe(user); // Ensure correct order
+    });
+
+    expect(queue.length).toBe(0);
+    expect(queue.pop()).toBeUndefined(); // No more users to pop
+  });
+
+  test('should handle pushing and popping in alternating fashion', () => {
+    const user1 = new User('Alice');
+    const user2 = new User('Bob');
+    const user3 = new User('Charlie');
+
+    queue.push(user1);
+    expect(queue.pop()).toBe(user1); // Pop immediately after push
+
+    queue.push(user2);
+    queue.push(user3);
+    expect(queue.pop()).toBe(user2);
+    expect(queue.pop()).toBe(user3);
+    expect(queue.length).toBe(0);
+  });
+
+  test('should not break when popping after head > tail', () => {
+    const user1 = new User('Alice');
+    const user2 = new User('Bob');
+    queue.push(user1);
+    queue.push(user2);
+
+    expect(queue.pop()).toBe(user1);
+    expect(queue.pop()).toBe(user2);
+    expect(queue.pop()).toBeUndefined(); // No more users to pop, head should be reset
+  });
+});
+

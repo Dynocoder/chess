@@ -1,6 +1,11 @@
 export default class UserQueue {
+
+
   constructor() {
+    /** @private */
     this.items = {}
+
+    /** @private */
     this.head = this.tail = undefined;
     this.length = 0;
   }
@@ -44,7 +49,7 @@ export default class UserQueue {
   * @returns {User} user
   */
   peek() {
-    if (this.head) {
+    if (this.head !== undefined) {
       return this.items[this.head]
     }
     return undefined;

@@ -1,5 +1,6 @@
 import { lookup } from "dns";
 import UserQueue from "./UserQueue.js";
+import GameLogic from "./GameLogic.js";
 
 
 export default class GamesController {
@@ -10,6 +11,7 @@ export default class GamesController {
   * - Maintaining lookup queue.
   */
   constructor() {
+    /** @type {User[]} */
     this.games = [];
     this.lookupQueue = new UserQueue();
   }
@@ -19,14 +21,38 @@ export default class GamesController {
   * @param {User} user
   */
   enqueueForLookup(user) {
+    // TODO: add logic to verify if the user is still connected.
     this.lookupQueue.push(user);
+    this.checkForMatch();
   }
 
-
   clearQueue() {
-    for (let i = 0; i < this.lookupQueue.length; i++) {
+    while (this.lookupQueue.length != 0) {
       this.lookupQueue.pop();
     }
   }
+  clearGames() {
+    this.games = [];
+  }
+
+
+  /** @private */
+  checkForMatch() {
+    if (this.lookupQueue.length > 1) {
+      //can start match
+      let userA = this.lookupQueue.pop();
+      let userB = this.lookupQueue.pop();
+      if (userA && userB) {
+        let game = new GameLogic(userA, userB);
+        this.games.push(game);
+        game.initiate();
+      }
+      else {
+        throw new Error(`User: ${userB ? userA : userB} is not defined.`);
+      }
+    }
+  }
+
+
 
 }

@@ -5,7 +5,6 @@ import { Server } from "http";
 
 export default class WSManager {
 
-  userList = [];
   messageType = {
     'GetInitialState': 1,
   }
@@ -20,6 +19,7 @@ export default class WSManager {
    */
   constructor(gc) {
     this.gc = gc
+    this.userList = new Map();
     // this.wss = wss;
   }
 
@@ -33,16 +33,26 @@ export default class WSManager {
       id: uuid(),
       ws: ws
     }
+
+    this.userList.set(user.ws, user.id);
     this.gc.enqueueForLookup(user);
   }
 
   /**
-  * @param {User} user
-  * @param {User[]} userList
+   * @param {WebSocket} ws
+   * @returns {boolean} true if the item existed and is removed, false if item does not exist.
   */
-  removeUser(user, userList) {
+  removeUser(ws) {
+    const uid = this.userList.get(ws);
+    this.userList.delete(ws);
   }
 
+
+  clearUserList() {
+    Array.from(this.userList.keys()).forEach((k) => {
+      this.userList.delete(k);
+    });
+  }
 
   /**
    * Creates a new WebSocketServer Instance with the passed http server attached.
@@ -55,15 +65,15 @@ export default class WSManager {
     this.wss.on('connection', (ws, request) => {
       // TODO: send the uuid back to the client.
       this.addUser(ws);
+
       ws.on('message', (data) => {
         console.log(`[server]: received -> ${data}`)
         ws.send(data)
       })
-    })
 
-
-    this.wss.on('close', (ws, request) => {
-
+      ws.on('close', (data) => {
+        this.removeUser(ws);
+      })
     })
   }
 
@@ -75,14 +85,6 @@ export default class WSManager {
   startMultiplayerSearch(user) {
   }
 
-
-  /**
-   * @param {WebSocket} ws - the Websocket to subscribe to events for.
-   * @param {import("express").Request} request - request parameters.
-   */
-  connectionSubscriber(ws, request) {
-    //TODO: implement logic
-  }
 
   /**
   * send the initial board state when all pieces are in their initial position
